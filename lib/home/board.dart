@@ -57,7 +57,8 @@ class _BoardState extends State<Board> {
             print('Game won');
             print(sec);
             if ((_user.min == 0 && _user.sec == 0) ||
-                (_user.min >= min && _user.sec > sec)) {
+                ((_user.min > min) ||
+                    ((_user.min == min) && _user.sec > sec))) {
               print('saving');
               _user.min = min;
               _user.sec = sec;
