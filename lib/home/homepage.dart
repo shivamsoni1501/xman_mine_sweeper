@@ -135,6 +135,23 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  revealNeighbourMines(i, j, {l = 1}) async {
+    if (Game.points > 0) {
+      for (int x = i - l; x <= i + l; x++) {
+        for (int y = j - l; y <= j + l; y++) {
+          if (x >= 0 && x < grideL && y >= 0 && y < grideW) {
+            if (!(i == x && j == y) && Game.field[x][y].value == -1) {
+              Game.field[x][y].isFlaged = true;
+            }
+          }
+        }
+      }
+      Game.points -= 1;
+      setState(() {});
+      Game.savePoints();
+    }
+  }
+
   minI(x, y) {
     if (x < y) {
       return x;
@@ -210,6 +227,25 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  pointsInfo() {
+    showDialog(
+        context: context,
+        builder: (contx) {
+          return AlertDialog(
+            title: const Text(
+              'Power Points',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: XColor.basetextC),
+            ),
+            content: const Text(
+              'Why rely on luck when you got special power. You can use the Power points to locate nearby mines by double tapping on any position. Remember!, this power will not take into account the tapping position.',
+              style: TextStyle(color: Colors.grey),
+            ),
+            backgroundColor: XColor.baseC.withAlpha(150),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     // print(countMine);
@@ -217,37 +253,48 @@ class _HomePageState extends State<HomePage> {
     // print(grideL * grideW);
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              height: 50,
-              width: 50,
-              decoration: const BoxDecoration(
-                gradient:
-                    RadialGradient(colors: [Colors.black54, XColor.baseC]),
-              ),
-              child: Image.asset(
-                'assets/images/safe_mine-3.png',
-                cacheWidth: 100,
-                cacheHeight: 100,
-                fit: BoxFit.contain,
-              ),
+        leading: Center(
+          child: CircleAvatar(
+            maxRadius: 25,
+            backgroundColor: XColor.basetextC,
+            child: Image.asset(
+              'assets/images/mine_icon.png',
+              cacheWidth: 100,
+              cacheHeight: 100,
+              fit: BoxFit.contain,
+              width: 30,
             ),
-            const SizedBox(
-              width: 15,
-            ),
-            const Text(
-              "X-Mines",
-              style: TextStyle(
-                  letterSpacing: 2,
-                  color: XColor.basetextC,
-                  fontWeight: FontWeight.bold),
-            ),
-          ],
+          ),
+        ),
+        title: const Text(
+          "X-Mines",
+          style: TextStyle(
+              letterSpacing: 2,
+              color: XColor.basetextC,
+              fontWeight: FontWeight.bold),
         ),
         actions: [
-          InkWell(
+          // Align(
+          //   child: GestureDetector(
+          //     onTap: () {
+          //       pointsInfo();
+          //     },
+          //     child: Container(
+          //       padding:
+          //           const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+          //       decoration: BoxDecoration(
+          //         borderRadius: BorderRadius.circular(50),
+          //         border: Border.all(color: XColor.accentC, width: 2),
+          //       ),
+          //       child: Text(
+          //         Game.points.toString(),
+          //         style: const TextStyle(color: XColor.accentC, fontSize: 16),
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(width: 10),
+          GestureDetector(
             onTap: () {
               showSettingsDialog();
             },
@@ -274,11 +321,13 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Board(
-                      icon: Icons.highlight_off_rounded,
+                      icon: Icon(
+                        Icons.highlight_off_rounded,
+                        color: XColor.basetextC.withAlpha(50),
+                      ),
                       text: countMine.toString()),
                   InkWell(
                     onTap: () {
-                      // revealAllCells();
                       setupGame();
                       setState(() {});
                     },
@@ -303,7 +352,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   Board(
-                    icon: Icons.alarm,
+                    icon: Icon(Icons.alarm,
+                        color: XColor.basetextC.withAlpha(50)),
                     isgamestart: Game.isgamestarted,
                     isgameover: Game.isgameover,
                   ),
@@ -341,6 +391,9 @@ class _HomePageState extends State<HomePage> {
                           }
                           tryRevealCell(x, y);
                         },
+                        // onDoubleTap: () {
+                        //   revealNeighbourMines(x, y);
+                        // },
                         child: GameTile(
                           patch: Game.field[x][y],
                         ));

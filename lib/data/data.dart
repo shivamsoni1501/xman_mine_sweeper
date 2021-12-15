@@ -29,10 +29,11 @@ class Game {
   static List<List<Patch>> field = [];
   static List<int> fWidth = [8, 9, 10, 11, 12];
 
-  static List<int> fHeight = [8, 10, 12, 14, 16, 18, 20];
+  static List<int> fHeight = [8, 12, 16, 20, 24];
+
+  static int points = 0;
 
   static List<double> fProb = [
-    .05,
     .1,
     .15,
     .2,
@@ -50,6 +51,7 @@ class Game {
     Game.defaultWidth = prefs.getInt('defaultWidth') ?? 10;
     Game.defaultHeight = prefs.getInt('defaultHeight') ?? 16;
     Game.defaultProb = prefs.getDouble('defaultProb') ?? .15;
+    Game.points = prefs.getInt('points') ?? 5;
     Game.users = (prefs.getStringList('users') ?? [User().toJson()])
         .map((e) => User.fromJson(e))
         .toList();
@@ -73,6 +75,11 @@ class Game {
     prefs.setInt('defaultWidth', Game.defaultWidth);
     prefs.setInt('defaultHeight', Game.defaultHeight);
     prefs.setDouble('defaultProb', Game.defaultProb);
+  }
+
+  static savePoints() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('points', Game.points);
   }
 
   static createFieldSquare(int n, double prob) {
@@ -103,25 +110,45 @@ class Game {
     Game.field =
         List.generate(l, (i) => List.generate(w, (j) => Patch(x: i, y: j)));
     var random = Random();
-    for (int i = 0; i < l; i++) {
-      for (int j = 0; j < w; j++) {
-        if (random.nextDouble() <= prob) {
-          // feild[i][j].isMine = true;
-          Game.field[i][j].value = -1;
-          for (int r = i - 1; r <= i + 1; r++) {
-            for (int c = j - 1; c <= j + 1; c++) {
-              if (r >= 0 &&
-                  r < l &&
-                  c >= 0 &&
-                  c < w &&
-                  Game.field[r][c].value != -1) {
-                Game.field[r][c].value += 1;
-              }
+    int cmines = (l * w * prob + (5 * random.nextDouble())).floor() + 1;
+    int count = 0;
+    while (count < cmines) {
+      int i = random.nextInt(l);
+      int j = random.nextInt(w);
+      if (Game.field[i][j].value != -1) {
+        count += 1;
+        Game.field[i][j].value = -1;
+        for (int r = i - 1; r <= i + 1; r++) {
+          for (int c = j - 1; c <= j + 1; c++) {
+            if (r >= 0 &&
+                r < l &&
+                c >= 0 &&
+                c < w &&
+                Game.field[r][c].value != -1) {
+              Game.field[r][c].value += 1;
             }
           }
         }
       }
     }
+    // for (int i = 0; i < l; i++) {
+    //   for (int j = 0; j < w; j++) {
+    //     if (random.nextDouble() <= prob) {
+    //       Game.field[i][j].value = -1;
+    //       for (int r = i - 1; r <= i + 1; r++) {
+    //         for (int c = j - 1; c <= j + 1; c++) {
+    //           if (r >= 0 &&
+    //               r < l &&
+    //               c >= 0 &&
+    //               c < w &&
+    //               Game.field[r][c].value != -1) {
+    //             Game.field[r][c].value += 1;
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
   }
 }
 

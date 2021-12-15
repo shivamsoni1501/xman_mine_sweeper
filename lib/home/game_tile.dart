@@ -43,13 +43,13 @@ class GameTile extends StatelessWidget {
                   ? (Game.isgamewon)
                       ? Image.asset(
                           'assets/images/safe_mine-1.png',
-                          cacheHeight: 50,
-                          cacheWidth: 50,
+                          cacheHeight: 100,
+                          cacheWidth: 78,
                         )
                       : Image.asset(
                           'assets/images/d_mine.png',
-                          cacheHeight: 50,
-                          cacheWidth: 50,
+                          cacheHeight: 81,
+                          cacheWidth: 73,
                         )
                   : Text(
                       patch.value.toString(),

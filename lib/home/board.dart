@@ -12,7 +12,7 @@ class Board extends StatefulWidget {
     this.isgamestart = false,
     this.isgameover = false,
   }) : super(key: key);
-  IconData icon;
+  Widget icon;
   String text;
   bool isgamestart;
   bool isgameover;
@@ -110,7 +110,7 @@ class _BoardState extends State<Board> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(widget.icon, color: XColor.basetextC.withAlpha(50)),
+          widget.icon,
           const SizedBox(width: 10),
           Text(
             (widget.text == "timer")
